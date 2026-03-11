@@ -1,0 +1,2 @@
+# Zet hier de publieke URL naar latest.json, bijvoorbeeld:
+https://raw.githubusercontent.com/pclt-codebase/PCLT-eIDattendance/main/latest.json
