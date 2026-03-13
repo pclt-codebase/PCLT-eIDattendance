@@ -278,7 +278,7 @@ static void CreateShortcut(string shortcutPath, string targetPath, string workin
         shortcutType.InvokeMember("WorkingDirectory", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { workingDirectory });
 
         var iconLocation = File.Exists(iconPath)
-            ? iconPath
+            ? iconPath + ",0"
             : exeIconFallbackPath + ",0";
         shortcutType.InvokeMember("IconLocation", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { iconLocation });
         shortcutType.InvokeMember("Save", System.Reflection.BindingFlags.InvokeMethod, null, shortcut, null);
