@@ -44,6 +44,7 @@ dotnet publish "$root\Pclt.EidAttendance.Installer\Pclt.EidAttendance.Installer.
 
 Write-Host "[INFO] Prepare distributable package..."
 Copy-Item "$publishDir\Pclt.EidAttendance.App.exe" "$stageDir\Pclt.EidAttendance.App.exe" -Force
+Copy-Item "$root\Pclt.EidAttendance.App\app.ico" "$stageDir\app.ico" -Force
 Copy-Item "$root\run-eid.cmd" "$stageDir\run-eid.cmd" -Force
 Copy-Item "$root\update-eid.cmd" "$stageDir\update-eid.cmd" -Force
 Copy-Item "$root\update-eid.ps1" "$stageDir\update-eid.ps1" -Force

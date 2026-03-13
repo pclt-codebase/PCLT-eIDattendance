@@ -233,6 +233,9 @@ static void CreateShortcuts(string installDir)
         return;
     }
 
+    var iconPath = Path.Combine(installDir, "app.ico");
+    var exeIconFallbackPath = Path.Combine(installDir, "Pclt.EidAttendance.App.exe");
+
     var desktopShortcutPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
         "PCLT eID Attendance.lnk");
@@ -244,11 +247,11 @@ static void CreateShortcuts(string installDir)
 
     var startMenuShortcutPath = Path.Combine(startMenuPrograms, "PCLT eID Attendance.lnk");
 
-    CreateShortcut(desktopShortcutPath, runScriptPath, installDir);
-    CreateShortcut(startMenuShortcutPath, runScriptPath, installDir);
+    CreateShortcut(desktopShortcutPath, runScriptPath, installDir, iconPath, exeIconFallbackPath);
+    CreateShortcut(startMenuShortcutPath, runScriptPath, installDir, iconPath, exeIconFallbackPath);
 }
 
-static void CreateShortcut(string shortcutPath, string targetPath, string workingDirectory)
+static void CreateShortcut(string shortcutPath, string targetPath, string workingDirectory, string iconPath, string exeIconFallbackPath)
 {
     var shellType = Type.GetTypeFromProgID("WScript.Shell");
     if (shellType is null)
@@ -273,7 +276,11 @@ static void CreateShortcut(string shortcutPath, string targetPath, string workin
         var shortcutType = shortcut.GetType();
         shortcutType.InvokeMember("TargetPath", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { targetPath });
         shortcutType.InvokeMember("WorkingDirectory", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { workingDirectory });
-        shortcutType.InvokeMember("IconLocation", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { Path.Combine(workingDirectory, "Pclt.EidAttendance.App.exe") + ",0" });
+
+        var iconLocation = File.Exists(iconPath)
+            ? iconPath
+            : exeIconFallbackPath + ",0";
+        shortcutType.InvokeMember("IconLocation", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { iconLocation });
         shortcutType.InvokeMember("Save", System.Reflection.BindingFlags.InvokeMethod, null, shortcut, null);
     }
     finally
