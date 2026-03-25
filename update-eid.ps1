@@ -1,15 +1,38 @@
 param(
-    [Parameter(Mandatory = $true)]
-    [string]$InstallDir,
+    [Parameter(Mandatory = $false)]
+    [string]$InstallDir = "",
 
-    [Parameter(Mandatory = $true)]
-    [string]$ManifestUrl,
+    [Parameter(Mandatory = $false)]
+    [string]$ManifestUrl = "",
 
     [Parameter(Mandatory = $false)]
     [int]$WaitPid = 0
 )
 
 $ErrorActionPreference = 'Stop'
+
+function Resolve-ManifestUrl([string]$manifestUrlArg, [string]$installPath) {
+    if (-not [string]::IsNullOrWhiteSpace($manifestUrlArg)) {
+        return $manifestUrlArg.Trim()
+    }
+
+    $configPath = Join-Path $installPath 'update-manifest-url.txt'
+    if (Test-Path $configPath) {
+        foreach ($line in Get-Content $configPath) {
+            $value = $line.Trim()
+            if (-not [string]::IsNullOrWhiteSpace($value) -and -not $value.StartsWith('#')) {
+                return $value
+            }
+        }
+    }
+
+    $fromEnvironment = [System.Environment]::GetEnvironmentVariable('EID_UPDATE_MANIFEST_URL')
+    if (-not [string]::IsNullOrWhiteSpace($fromEnvironment)) {
+        return $fromEnvironment.Trim()
+    }
+
+    return ''
+}
 
 function Get-VersionObject([string]$value) {
     try {
@@ -20,7 +43,16 @@ function Get-VersionObject([string]$value) {
     }
 }
 
+if ([string]::IsNullOrWhiteSpace($InstallDir)) {
+    $InstallDir = $PSScriptRoot
+}
+
 $installPath = (Resolve-Path $InstallDir).Path
+$resolvedManifestUrl = Resolve-ManifestUrl $ManifestUrl $installPath
+if ([string]::IsNullOrWhiteSpace($resolvedManifestUrl)) {
+    throw 'Geen update manifest URL gevonden. Zet een URL in update-manifest-url.txt of variabele EID_UPDATE_MANIFEST_URL.'
+}
+
 $versionFile = Join-Path $installPath 'version.txt'
 $runScriptPath = Join-Path $installPath 'run-eid.cmd'
 $appExePath = Join-Path $installPath 'Pclt.EidAttendance.App.exe'
@@ -28,8 +60,8 @@ $currentVersionString = if (Test-Path $versionFile) { (Get-Content $versionFile 
 $currentVersion = Get-VersionObject $currentVersionString
 
 Write-Host "[INFO] Huidige versie: $currentVersionString"
-Write-Host "[INFO] Manifest ophalen: $ManifestUrl"
-$manifest = Invoke-RestMethod -Uri $ManifestUrl -Method Get
+Write-Host "[INFO] Manifest ophalen: $resolvedManifestUrl"
+$manifest = Invoke-RestMethod -Uri $resolvedManifestUrl -Method Get
 
 if ($WaitPid -gt 0) {
     try {

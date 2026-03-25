@@ -1,31 +1,7 @@
 @echo off
-setlocal EnableExtensions EnableDelayedExpansion
+setlocal EnableExtensions
 
 cd /d "%~dp0"
-
-set "MANIFEST_FILE=%~dp0update-manifest-url.txt"
-set "RESOLVED_MANIFEST_URL="
-
-if exist "%MANIFEST_FILE%" (
-  for /f "usebackq tokens=* delims=" %%L in ("%MANIFEST_FILE%") do (
-    set "LINE=%%L"
-    if defined LINE (
-      if not "!LINE:~0,1!"=="#" (
-        if not defined RESOLVED_MANIFEST_URL set "RESOLVED_MANIFEST_URL=!LINE!"
-      )
-    )
-  )
-)
-
-if not defined RESOLVED_MANIFEST_URL if defined EID_UPDATE_MANIFEST_URL set "RESOLVED_MANIFEST_URL=%EID_UPDATE_MANIFEST_URL%"
-
-if not defined RESOLVED_MANIFEST_URL (
-  echo [FOUT] Geen update manifest URL gevonden.
-  echo Zet een geldige URL in update-manifest-url.txt of variabele EID_UPDATE_MANIFEST_URL.
-  echo.
-  pause >nul
-  exit /b 1
-)
 
 set "WAITPID="
 if /I "%~1"=="--wait-pid" set "WAITPID=%~2"
@@ -36,7 +12,7 @@ if defined WAITPID set "WAITPID_ARG=-WaitPid %WAITPID%"
 set "INSTALL_DIR=%~dp0"
 if "%INSTALL_DIR:~-1%"=="\" set "INSTALL_DIR=%INSTALL_DIR:~0,-1%"
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0update-eid.ps1" -InstallDir "%INSTALL_DIR%" -ManifestUrl "%RESOLVED_MANIFEST_URL%" %WAITPID_ARG%
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0update-eid.ps1" -InstallDir "%INSTALL_DIR%" %WAITPID_ARG%
 set "EXITCODE=%ERRORLEVEL%"
 
 if not "%EXITCODE%"=="0" (
