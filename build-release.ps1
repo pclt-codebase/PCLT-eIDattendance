@@ -69,6 +69,18 @@ $manifest = @{
 }
 $manifest | ConvertTo-Json | Set-Content -Path $manifestPath -Encoding UTF8
 
+Write-Host "[INFO] Oude versie-artifacts opruimen..."
+$currentZipName = [System.IO.Path]::GetFileName($zipPath)
+$currentSetupName = [System.IO.Path]::GetFileName($setupPath)
+
+Get-ChildItem -Path (Join-Path $root "dist") -File -Filter "eidattendance-*-*.zip" |
+    Where-Object { $_.Name -ne $currentZipName } |
+    Remove-Item -Force -ErrorAction SilentlyContinue
+
+Get-ChildItem -Path (Join-Path $root "dist") -File -Filter "eidattendance-setup-*-*.exe" |
+    Where-Object { $_.Name -ne $currentSetupName } |
+    Remove-Item -Force -ErrorAction SilentlyContinue
+
 Write-Host "[OK] Klaar"
 Write-Host "[INFO] Zip : $zipPath"
 Write-Host "[INFO] Setup EXE : $setupPath"

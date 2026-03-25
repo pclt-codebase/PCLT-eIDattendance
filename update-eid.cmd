@@ -33,7 +33,10 @@ if /I "%~1"=="--wait-pid" set "WAITPID=%~2"
 set "WAITPID_ARG="
 if defined WAITPID set "WAITPID_ARG=-WaitPid %WAITPID%"
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0update-eid.ps1" -InstallDir "%~dp0" -ManifestUrl "%RESOLVED_MANIFEST_URL%" %WAITPID_ARG%
+set "INSTALL_DIR=%~dp0"
+if "%INSTALL_DIR:~-1%"=="\" set "INSTALL_DIR=%INSTALL_DIR:~0,-1%"
+
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0update-eid.ps1" -InstallDir "%INSTALL_DIR%" -ManifestUrl "%RESOLVED_MANIFEST_URL%" %WAITPID_ARG%
 set "EXITCODE=%ERRORLEVEL%"
 
 if not "%EXITCODE%"=="0" (

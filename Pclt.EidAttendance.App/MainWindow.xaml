@@ -1,0 +1,320 @@
+﻿<Window x:Class="Pclt.EidAttendance.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Pclt.EidAttendance.App.ViewModels"
+    Title="PCLT Aanwezigheden" Height="820" Width="980">
+
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{StaticResource PcltSurfaceBrush}" BorderBrush="{StaticResource PcltBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="16" Margin="0,0,0,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.ColumnSpan="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,4">
+                    <TextBlock Text="PCLT eID Attendance" FontSize="24" FontWeight="Bold" Foreground="{StaticResource PcltPrimaryBrush}"/>
+                    <Border Background="{StaticResource PcltPrimaryBrush}" CornerRadius="10" Margin="10,2,0,0" Padding="8,2">
+                        <TextBlock Text="{Binding CurrentVersion, StringFormat=v{0}}" Foreground="White" FontSize="11" FontWeight="Bold"/>
+                    </Border>
+                </StackPanel>
+                <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="Registratie van aanwezigen voor opleidingen en events - update test" Foreground="{StaticResource PcltPrimaryDarkBrush}" Margin="0,0,0,14"/>
+
+                <Grid Grid.Row="2" Grid.ColumnSpan="3" Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding UpdateStatusText}"
+                               VerticalAlignment="Center"
+                               Foreground="{StaticResource PcltPrimaryDarkBrush}"
+                               FontWeight="SemiBold"/>
+
+                    <Button Grid.Column="1"
+                            Content="Controleer updates"
+                            Command="{Binding CheckForUpdatesCommand}"
+                            Width="150"
+                            Margin="8,0,8,0"/>
+
+                    <Button Grid.Column="2"
+                            Content="Download update"
+                            Command="{Binding DownloadUpdateCommand}"
+                            Width="140"
+                            Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                </Grid>
+
+                <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,0,10,0">
+                    <Label Content="Opleidingsnummer:"/>
+                    <TextBox Text="{Binding EventNumber, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,0,10,0">
+                    <Label Content="Naam opleiding:"/>
+                    <TextBox Text="{Binding EventName, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="3" Grid.Column="2">
+                    <Label Content="Locatie:"/>
+                    <TextBox Text="{Binding Location, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="4" Grid.Column="0" Margin="0,0,10,0">
+                    <Label Content="Datum:"/>
+                    <DatePicker SelectedDate="{Binding EventDate, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="4" Grid.Column="1" Margin="0,0,10,0">
+                    <Label Content="Lesgever:"/>
+                    <TextBox Text="{Binding EventTeacher, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="4" Grid.Column="2"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Background="{StaticResource PcltSurfaceBrush}" BorderBrush="{StaticResource PcltBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,12">
+            <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox Grid.Column="0" Margin="0,0,8,0"
+                     Text="{Binding CsvPath, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Grid.Column="1" Content="Opslaglocatie registratie" Command="{Binding BrowseCsvCommand}" Width="180" Margin="0,0,8,0"/>
+            <Button Grid.Column="2" Content="Laad registratiebestand" Command="{Binding LoadCsvCommand}" Width="170"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Background="{StaticResource PcltSurfaceBrush}" BorderBrush="{StaticResource PcltBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="Start registratie" Command="{Binding StartEventCommand}" Width="130" Margin="5"/>
+            <Button Content="Stop registratie" Command="{Binding StopEventCommand}" Width="130" Margin="5"/>
+            <Button Content="Opslaan" Command="{Binding SaveCsvCommand}" Width="100" Margin="5"/>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="3" Margin="0,12,0,0" CornerRadius="10" Padding="14" BorderThickness="3">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="{StaticResource PcltSurfaceBrush}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource PcltBorderBrush}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsReadingCard}" Value="True">
+                            <Setter Property="Background" Value="{StaticResource PcltReadingBrush}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource PcltReadingBorderBrush}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsReadyForNewCard}" Value="True">
+                            <Setter Property="Background" Value="{StaticResource PcltReadyBrush}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource PcltReadyBorderBrush}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsWaitingForCardRemoval}" Value="True">
+                            <Setter Property="Background" Value="{StaticResource PcltPrimaryBrush}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource PcltPrimaryDarkBrush}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+
+            <StackPanel>
+                <TextBlock Text="{Binding CardVisualTitle}"
+                           FontSize="30"
+                           FontWeight="ExtraBold"
+                           HorizontalAlignment="Center"
+                           TextAlignment="Center"
+                           Margin="0,0,0,6">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{StaticResource PcltPrimaryDarkBrush}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsReadingCard}" Value="True">
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsReadyForNewCard}" Value="True">
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsWaitingForCardRemoval}" Value="True">
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <TextBlock Text="{Binding CardInstruction}"
+                           FontSize="15"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Center"
+                           TextAlignment="Center"
+                           Margin="0,0,0,8">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{StaticResource PcltPrimaryDarkBrush}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsReadingCard}" Value="True">
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsReadyForNewCard}" Value="True">
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsWaitingForCardRemoval}" Value="True">
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <TextBlock Text="{Binding StatusText}"
+                           FontSize="13"
+                           HorizontalAlignment="Center"
+                           TextAlignment="Center"
+                           Margin="0,0,0,8">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{StaticResource PcltPrimaryDarkBrush}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsReadingCard}" Value="True">
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsReadyForNewCard}" Value="True">
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsWaitingForCardRemoval}" Value="True">
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <ProgressBar Height="14"
+                             Margin="40,0,40,0"
+                             Foreground="White"
+                             IsIndeterminate="True"
+                             Visibility="{Binding IsReadingCard, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="4" Margin="0,10,0,0" Background="{StaticResource PcltSurfaceBrush}" BorderBrush="{StaticResource PcltBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
+                           Text="Registratiebestanden op deze pc"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource PcltPrimaryDarkBrush}"
+                           Margin="0,0,0,6"/>
+
+                <ListBox Grid.Row="1" Grid.Column="0"
+                         Height="110"
+                         Margin="0,0,10,0"
+                         ItemsSource="{Binding RegistrationHistoryEntries}"
+                         SelectedItem="{Binding SelectedRegistrationEntry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,2">
+                                <TextBlock Text="{Binding FileName}" FontWeight="SemiBold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{StaticResource PcltPrimaryDarkBrush}"/>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Text="{Binding DirectoryPath}" FontSize="11" Foreground="Gray" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding StatusText}" FontSize="11">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#FF1E7D4F"/>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Top">
+                    <Button Content="Laad geselecteerd"
+                            Command="{Binding LoadSelectedRegistrationPathCommand}"
+                            Width="170"
+                            Height="35"
+                            Margin="0,0,0,8"/>
+                    <Button Content="Ga naar locatie bestand"
+                            Command="{Binding OpenSelectedRegistrationPathCommand}"
+                            Width="170"
+                            Height="35"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="5" Margin="0,15,0,0" Background="{StaticResource PcltSurfaceBrush}" BorderBrush="{StaticResource PcltBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0"
+                           Text="Users CSV-preview (live, laatste bovenaan)"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource PcltPrimaryDarkBrush}"
+                           Margin="0,0,0,6"/>
+
+                <DataGrid Grid.Row="1"
+                          ItemsSource="{Binding Registrations}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Deelnemer" Binding="{Binding ParticipantNumber}" Width="Auto"/>
+                        <DataGridTextColumn Header="Opleidingsnummer" Binding="{Binding TrainingNumber}" Width="*"/>
+                        <DataGridTextColumn Header="Voornaam" Binding="{Binding FirstName}" Width="*"/>
+                        <DataGridTextColumn Header="Achternaam" Binding="{Binding LastName}" Width="*"/>
+                        <DataGridTextColumn Header="Rijksregisternummer" Binding="{Binding NationalNumber}" Width="*"/>
+                        <DataGridTextColumn Header="Adres" Binding="{Binding Address}" Width="*"/>
+                        <DataGridTextColumn Header="Postcode" Binding="{Binding PostalCode}" Width="Auto"/>
+                        <DataGridTextColumn Header="Gemeente" Binding="{Binding City}" Width="*"/>
+                        <DataGridTextColumn Header="Nationaliteit" Binding="{Binding Nationality}" Width="*"/>
+                        <DataGridTextColumn Header="Geslacht" Binding="{Binding Gender}" Width="Auto"/>
+                        <DataGridTextColumn Header="Geboortedatum" Binding="{Binding BirthDate, StringFormat=dd/MM/yyyy}" Width="Auto"/>
+                        <DataGridTextColumn Header="Geboorteplaats" Binding="{Binding BirthPlace}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

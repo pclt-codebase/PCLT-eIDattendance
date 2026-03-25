@@ -22,6 +22,8 @@ function Get-VersionObject([string]$value) {
 
 $installPath = (Resolve-Path $InstallDir).Path
 $versionFile = Join-Path $installPath 'version.txt'
+$runScriptPath = Join-Path $installPath 'run-eid.cmd'
+$appExePath = Join-Path $installPath 'Pclt.EidAttendance.App.exe'
 $currentVersionString = if (Test-Path $versionFile) { (Get-Content $versionFile -Raw).Trim() } else { '0.0.0' }
 $currentVersion = Get-VersionObject $currentVersionString
 
@@ -72,6 +74,19 @@ try {
     Copy-Item "$extractPath\*" $installPath -Recurse -Force
 
     Set-Content -Path $versionFile -Value $remoteVersionString -NoNewline
+
+    # Start opnieuw op na een succesvolle update zodat gebruiker meteen de nieuwe versie draait.
+    if (Test-Path $appExePath) {
+        Start-Process -FilePath $appExePath -WorkingDirectory $installPath | Out-Null
+        Write-Host "[INFO] Applicatie herstart via Pclt.EidAttendance.App.exe"
+    }
+    elseif (Test-Path $runScriptPath) {
+        Start-Process -FilePath $runScriptPath -WorkingDirectory $installPath | Out-Null
+        Write-Host "[INFO] Applicatie herstart via run-eid.cmd"
+    }
+    else {
+        Write-Host "[WAARSCHUWING] Herstart overgeslagen: geen runscript of app-exe gevonden."
+    }
 
     Write-Host "[OK] Update voltooid naar versie $remoteVersionString"
     exit 0
