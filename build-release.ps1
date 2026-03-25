@@ -67,7 +67,8 @@ $manifest = @{
     url          = "https://YOUR-HOST/eidattendance-$Version-$Runtime.zip"
     installerUrl = "https://YOUR-HOST/eidattendance-setup-$Version-$Runtime.exe"
 }
-$manifest | ConvertTo-Json | Set-Content -Path $manifestPath -Encoding UTF8
+$manifestJson = $manifest | ConvertTo-Json
+[System.IO.File]::WriteAllText($manifestPath, $manifestJson, (New-Object System.Text.UTF8Encoding($false)))
 
 Write-Host "[INFO] Oude versie-artifacts opruimen..."
 $currentZipName = [System.IO.Path]::GetFileName($zipPath)

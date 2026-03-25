@@ -34,6 +34,19 @@ function Resolve-ManifestUrl([string]$manifestUrlArg, [string]$installPath) {
     return ''
 }
 
+function Resolve-ManifestObject($manifestResponse) {
+    if ($null -eq $manifestResponse) {
+        throw 'Manifest is leeg of onleesbaar.'
+    }
+
+    if ($manifestResponse -is [string]) {
+        $manifestJson = $manifestResponse.TrimStart([char]0xFEFF)
+        return $manifestJson | ConvertFrom-Json
+    }
+
+    return $manifestResponse
+}
+
 function Get-VersionObject([string]$value) {
     try {
         return [Version]$value
@@ -61,7 +74,8 @@ $currentVersion = Get-VersionObject $currentVersionString
 
 Write-Host "[INFO] Huidige versie: $currentVersionString"
 Write-Host "[INFO] Manifest ophalen: $resolvedManifestUrl"
-$manifest = Invoke-RestMethod -Uri $resolvedManifestUrl -Method Get
+$manifestResponse = Invoke-RestMethod -Uri $resolvedManifestUrl -Method Get
+$manifest = Resolve-ManifestObject $manifestResponse
 
 if ($WaitPid -gt 0) {
     try {
